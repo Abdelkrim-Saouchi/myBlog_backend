@@ -36,3 +36,12 @@ exports.getSpecificPost = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.deletePost = async (req, res, next) => {
+  try {
+    await Post.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Post deleted' });
+  } catch (err) {
+    next(err);
+  }
+};
