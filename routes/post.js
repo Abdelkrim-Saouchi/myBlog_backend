@@ -18,4 +18,7 @@ router.get('/:id', postController.getSpecificPost);
 // DELETE request to delete a post
 router.delete('/:id', postController.deletePost);
 
+// PUT request to update a post
+router.put('/:id', postController.updatePost);
+
 module.exports = router;

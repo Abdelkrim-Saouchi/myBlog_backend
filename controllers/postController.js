@@ -45,3 +45,24 @@ exports.deletePost = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.updatePost = async (req, res, next) => {
+  const post = new Post({
+    _id: req.params.id,
+    author: req.body.author,
+    title: req.body.title,
+    content: req.body.content,
+    comments: req.body.comments,
+    published: req.body.published,
+  });
+  try {
+    const updatedPost = await Post.findByIdAndUpdate(
+      req.params.id,
+      post,
+      {}
+    );
+    res.json({message: 'Post updated'});
+  } catch (err) {
+    next(err);
+  }
+};
