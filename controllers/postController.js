@@ -30,7 +30,7 @@ exports.createPost = async (req, res, next) => {
 
 exports.getSpecificPost = async (req, res, next) => {
   try {
-    const post = await Post.findById(req.params.id).exec();
+    const post = await Post.findById(req.params.postId).exec();
     res.json(post);
   } catch (err) {
     next(err);
@@ -39,7 +39,7 @@ exports.getSpecificPost = async (req, res, next) => {
 
 exports.deletePost = async (req, res, next) => {
   try {
-    await Post.findByIdAndDelete(req.params.id);
+    await Post.findByIdAndDelete(req.params.postId);
     res.json({ message: 'Post deleted' });
   } catch (err) {
     next(err);
@@ -48,7 +48,7 @@ exports.deletePost = async (req, res, next) => {
 
 exports.updatePost = async (req, res, next) => {
   const post = new Post({
-    _id: req.params.id,
+    _id: req.params.postId,
     author: req.body.author,
     title: req.body.title,
     content: req.body.content,
@@ -57,11 +57,11 @@ exports.updatePost = async (req, res, next) => {
   });
   try {
     const updatedPost = await Post.findByIdAndUpdate(
-      req.params.id,
+      req.params.postId,
       post,
       {}
     );
-    res.json({message: 'Post updated'});
+    res.json({ message: 'Post updated' });
   } catch (err) {
     next(err);
   }
