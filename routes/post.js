@@ -1,17 +1,15 @@
 const router = require('express').Router();
 const passport = require('passport');
+const postController = require('../controllers/postController');
 
 // GET list of all posts
-router.get('/', (req, res) => {
-  res.json({ posts: ['Hello'] });
-});
+router.get('/', postController.getAllPostsList);
 
+// POST request to create a post
 router.post(
   '/',
   passport.authenticate('jwt', { session: false }),
-  (req, res) => {
-    res.json({ message: 'post created' });
-  }
+  postController.createPost
 );
 
 module.exports = router;

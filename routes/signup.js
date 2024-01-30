@@ -1,21 +1,7 @@
 const router = require('express').Router();
-const Author = require('../models/author');
+const singUpController = require('../controllers/singupController');
 
-// Signup new author
-router.post('/', async (req, res, next) => {
-  const author = new Author({
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    email: req.body.email,
-    password: req.body.password,
-  });
-
-  try {
-    await author.save();
-    res.json(author);
-  } catch (err) {
-    next(err);
-  }
-});
+// Post request to Signup new author
+router.post('/', singUpController.singUpPost);
 
 module.exports = router;
