@@ -12,4 +12,7 @@ router.post(
   postController.createPost
 );
 
+// GET request to get a specific post
+router.get('/:id', postController.getSpecificPost);
+
 module.exports = router;

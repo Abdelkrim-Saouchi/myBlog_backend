@@ -27,3 +27,12 @@ exports.createPost = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getSpecificPost = async (req, res, next) => {
+  try {
+    const post = await Post.findById(req.params.id).exec();
+    res.json(post);
+  } catch (err) {
+    next(err);
+  }
+};
