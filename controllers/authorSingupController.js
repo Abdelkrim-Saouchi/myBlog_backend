@@ -1,6 +1,6 @@
 const Author = require('../models/author');
 
-exports.singUpPost = async (req, res, next) => {
+exports.authorSingUp = async (req, res, next) => {
   const author = new Author({
     firstName: req.body.firstName,
     lastName: req.body.lastName,

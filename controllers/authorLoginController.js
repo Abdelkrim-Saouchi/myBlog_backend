@@ -2,7 +2,7 @@ const Author = require('../models/author');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 
-exports.logInPost = async (req, res, next) => {
+exports.authorLogIn = async (req, res, next) => {
   const { email, password } = req.body;
   try {
     const author = await Author.findOne(
