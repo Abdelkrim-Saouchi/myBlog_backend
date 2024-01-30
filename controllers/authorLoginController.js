@@ -16,7 +16,7 @@ exports.authorLogIn = async (req, res, next) => {
         options.expiresIn = 120 * 60 * 60;
         const secret = process.env.SECRET;
         const token = jwt.sign(
-          { id: author._id, email: author.email },
+          { id: author._id, email: author.email, admin: true },
           secret,
           options
         );

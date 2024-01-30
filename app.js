@@ -2,8 +2,9 @@ const express = require('express');
 const app = express();
 const indexRouter = require('./routes/index');
 const postRouter = require('./routes/post');
-const signUpRouter = require('./routes/authorSignup');
-const loginRouter = require('./routes/authorLogin');
+const authorSignUpRouter = require('./routes/authorSignup');
+const authorLoginRouter = require('./routes/authorLogin');
+const userRouter = require('./routes/user');
 
 // Config passport js
 const passport = require('passport');
@@ -19,8 +20,9 @@ require('./config/db');
 // routes
 app.use(indexRouter);
 app.use('/api/v1/posts', postRouter);
-app.use('/author/signup', signUpRouter);
-app.use('/author/login', loginRouter);
+app.use('/author/signup', authorSignUpRouter);
+app.use('/author/login', authorLoginRouter);
+app.use('/user', userRouter);
 
 app.use((err, req, res, next) => {
   res.status(err.status || 500);
