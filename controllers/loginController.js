@@ -13,7 +13,7 @@ exports.logInPost = async (req, res, next) => {
     if (email === author.email) {
       if (password === author.password) {
         const options = {};
-        options.expiresIn = 120;
+        options.expiresIn = 120 * 60 * 60;
         const secret = process.env.SECRET;
         const token = jwt.sign(
           { id: author._id, email: author.email },
