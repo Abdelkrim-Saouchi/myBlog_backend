@@ -20,9 +20,9 @@ require('./config/db');
 // routes
 app.use(indexRouter);
 app.use('/api/v1/posts', postRouter);
-app.use('/author/signup', authorSignUpRouter);
-app.use('/author/login', authorLoginRouter);
-app.use('/user', userRouter);
+app.use('/api/v1/author/signup', authorSignUpRouter);
+app.use('/api/v1/author/login', authorLoginRouter);
+app.use('/api/v1/user', userRouter);
 
 app.use((err, req, res, next) => {
   res.status(err.status || 500);

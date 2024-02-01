@@ -11,7 +11,7 @@ exports.userSignUp = async (req, res, next) => {
 
   try {
     await user.save();
-    res.json(user);
+    res.json(user._id);
   } catch (err) {
     next(err);
   }
