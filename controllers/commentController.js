@@ -1,7 +1,5 @@
 const Post = require('../models/post');
 const Comment = require('../models/comment');
-const User = require('../models/user');
-const mongoose = require('mongoose');
 
 exports.getAllComments = async (req, res, next) => {
   try {
@@ -16,7 +14,8 @@ exports.getAllComments = async (req, res, next) => {
 
 exports.createComment = async (req, res, next) => {
   const newComment = new Comment({
-    author: new mongoose.Types.ObjectId(),
+    post: req.body.post,
+    author: req.body.author,
     content: req.body.content,
   });
 

@@ -41,7 +41,7 @@ router.get('/:postId/comments', commentController.getAllComments);
 router.post(
   '/:postId/comments',
   passport.authenticate('jwt', { session: false }),
-  checkPermission(['user']),
+  checkPermission(['user', 'author']),
   commentController.createComment
 );
 
