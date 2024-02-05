@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 const indexRouter = require('./routes/index');
 const postRouter = require('./routes/post');
 const authorSignUpRouter = require('./routes/authorSignup');
@@ -13,6 +14,7 @@ passport.use(jwtStrategy);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
 // Config db
 require('./config/db');

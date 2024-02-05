@@ -1,21 +1,36 @@
 const User = require('../models/user');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
+const { body, validationResult } = require('express-validator');
 
-exports.userSignUp = async (req, res, next) => {
-  const user = new User({
-    username: req.body.username,
-    email: req.body.email,
-    password: req.body.password,
-  });
+exports.userSignUp = [
+  body('username', 'Invalid username').trim().isLength({ min: 1 }).escape(),
+  body('email', 'Invalid email').trim().isLength({ min: 1 }).escape(),
+  body('password', 'Invalid password').trim().isLength({ min: 1 }).escape(),
+  body('confirmation')
+    .custom((value, { req }) => {
+      return value === req.body.password;
+    })
+    .withMessage('Passwords do not match!'),
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const user = new User({
+      username: req.body.username,
+      email: req.body.email,
+      password: req.body.password,
+    });
 
-  try {
-    await user.save();
-    res.json(user._id);
-  } catch (err) {
-    next(err);
-  }
-};
+    try {
+      await user.save();
+      res.json(user._id);
+    } catch (err) {
+      next(err);
+    }
+  },
+];
 
 exports.userLogin = async (req, res, next) => {
   const { email, password } = req.body;
