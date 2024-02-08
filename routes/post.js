@@ -72,7 +72,7 @@ router.post(
 
 // DELETE request to delete like on specific post
 router.delete(
-  '/:postId/likes/likeId',
+  '/:postId/likes/:likeId',
   passport.authenticate('jwt', { session: false }),
   checkPermission(['user']),
   likeController.deleteLike

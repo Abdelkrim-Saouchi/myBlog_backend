@@ -2,6 +2,7 @@ const Like = require('../models/like');
 const Post = require('../models/post');
 
 exports.createLike = async (req, res, next) => {
+  console.log('user:', req.user._id);
   const like = new Like({
     owner: req.user._id,
   });

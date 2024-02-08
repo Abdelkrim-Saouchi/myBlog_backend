@@ -8,8 +8,8 @@ const options = {};
 options.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 options.secretOrKey = process.env.SECRET;
 
-const verifyAuthor = (payload, done) => {
-  const author = Author.findOne({ id: payload.id }, 'email').exec();
+const verifyAuthor = async (payload, done) => {
+  const author = await Author.findOne({ _id: payload.id }, 'email').exec();
   if (author) {
     // Add role to make access control
     const user = author;
@@ -19,13 +19,16 @@ const verifyAuthor = (payload, done) => {
   return done(null, false);
 };
 
-const verifyUser = (payload, done) => {
-  const user = User.findOne({ id: payload.id }, 'email username').exec();
+const verifyUser = async (payload, done) => {
+  const user = await User.findOne({ _id: payload.id }, 'email username').exec();
+
   if (user) {
     // Add role to make access control
+
     user.role = 'user';
     return done(null, user);
   }
+
   return done(null, false);
 };
 

@@ -16,7 +16,10 @@ exports.createPost = async (req, res, next) => {
     author: req.body.author,
     title: req.body.title,
     content: req.body.content,
+    readTime: req.body.readTime,
     comments: [],
+    likes: [],
+    topics: req.body.topics,
     published: req.body.published,
   });
 
@@ -47,18 +50,24 @@ exports.deletePost = async (req, res, next) => {
 };
 
 exports.updatePost = async (req, res, next) => {
-  const post = new Post({
-    _id: req.params.postId,
-    author: req.body.author,
-    title: req.body.title,
-    content: req.body.content,
-    comments: req.body.comments,
-    published: req.body.published,
-  });
   try {
+    const oldPost = await Post.findById(req.params.postId).exec();
+
+    const newPost = new Post({
+      _id: req.params.postId,
+      author: req.body.author,
+      title: req.body.title,
+      content: req.body.content,
+      readTime: req.body.readTime,
+      comments: oldPost.comments,
+      likes: oldPost.likes,
+      topics: req.body.topics,
+      published: req.body.published,
+    });
+
     const updatedPost = await Post.findByIdAndUpdate(
       req.params.postId,
-      post,
+      newPost,
       {}
     );
     res.json({ message: 'Post updated' });
