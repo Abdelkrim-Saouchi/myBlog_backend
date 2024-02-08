@@ -2,6 +2,7 @@ const router = require('express').Router();
 const passport = require('passport');
 const postController = require('../controllers/postController');
 const commentController = require('../controllers/commentController');
+const likeController = require('../controllers/likeController');
 const checkPermission = require('../middlewares/checkPermission');
 
 // GET list of all posts
@@ -59,6 +60,22 @@ router.put(
   passport.authenticate('jwt', { session: false }),
   checkPermission(['user', 'author']),
   commentController.updateComment
+);
+
+// POST request to create like on specific post
+router.post(
+  '/:postId/likes',
+  passport.authenticate('jwt', { session: false }),
+  checkPermission(['user']),
+  likeController.createLike
+);
+
+// DELETE request to delete like on specific post
+router.delete(
+  '/:postId/likes/likeId',
+  passport.authenticate('jwt', { session: false }),
+  checkPermission(['user']),
+  likeController.deleteLike
 );
 
 module.exports = router;
