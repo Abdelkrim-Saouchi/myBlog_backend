@@ -6,6 +6,7 @@ const postRouter = require('./routes/post');
 const authorSignUpRouter = require('./routes/authorSignup');
 const authorLoginRouter = require('./routes/authorLogin');
 const userRouter = require('./routes/user');
+const topicRouter = require('./routes/topic');
 
 // Config passport js
 const passport = require('passport');
@@ -22,9 +23,10 @@ require('./config/db');
 // routes
 app.use(indexRouter);
 app.use('/api/v1/posts', postRouter);
-app.use('/api/v1/author/signup', authorSignUpRouter);
-app.use('/api/v1/author/login', authorLoginRouter);
-app.use('/api/v1/user', userRouter);
+app.use('/api/v1/authors/signup', authorSignUpRouter);
+app.use('/api/v1/authors/login', authorLoginRouter);
+app.use('/api/v1/users', userRouter);
+app.use('/api/v1/topics', topicRouter);
 
 app.use((err, req, res, next) => {
   res.status(err.status || 500);
