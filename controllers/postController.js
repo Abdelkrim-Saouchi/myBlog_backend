@@ -4,6 +4,7 @@ exports.getAllPostsList = async (req, res, next) => {
   try {
     const allPosts = await Post.find({})
       .populate('author', 'firstName lastName')
+      .populate('topics')
       .exec();
     res.json(allPosts);
   } catch (err) {
