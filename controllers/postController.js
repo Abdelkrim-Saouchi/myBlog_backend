@@ -34,7 +34,10 @@ exports.createPost = async (req, res, next) => {
 
 exports.getSpecificPost = async (req, res, next) => {
   try {
-    const post = await Post.findById(req.params.postId).exec();
+    const post = await Post.findById(req.params.postId)
+      .populate('author', 'firstName lastName')
+      .populate('topics')
+      .exec();
     res.json(post);
   } catch (err) {
     next(err);
