@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { format } = require('date-fns');
 
 const Schema = mongoose.Schema;
 
@@ -24,5 +25,12 @@ const PostSchema = new Schema(
   },
   { timestamps: true }
 );
+
+PostSchema.virtual('creationDate').get(function () {
+  const formattedDate = format(this.createdAt, 'MMM dd yyyy');
+  return formattedDate;
+});
+
+PostSchema.set('toJSON', { virtuals: true });
 
 module.exports = mongoose.model('Post', PostSchema);
