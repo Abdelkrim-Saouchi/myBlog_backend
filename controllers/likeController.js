@@ -52,7 +52,7 @@ exports.getLikedStatus = async (req, res, next) => {
     if (!like) {
       return res.status(404).json({ message: 'Like not found' });
     }
-    res.json({ message: 'Like exists' });
+    res.json({ message: 'Like exists', likeId: like._id });
   } catch (err) {
     next(err);
   }
