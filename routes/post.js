@@ -70,12 +70,23 @@ router.post(
   likeController.createLike
 );
 
+// GET request to get specific like on specific post
+router.get('/:postId/likes/:likeId', likeController.getLike);
+
 // DELETE request to delete like on specific post
 router.delete(
   '/:postId/likes/:likeId',
   passport.authenticate('jwt', { session: false }),
   checkPermission(['user']),
   likeController.deleteLike
+);
+
+// GET request to get like status(liked before or not) of user
+router.get(
+  '/likes/status/:postId/',
+  passport.authenticate('jwt', { session: false }),
+  checkPermission(['user']),
+  likeController.getLikedStatus
 );
 
 module.exports = router;
