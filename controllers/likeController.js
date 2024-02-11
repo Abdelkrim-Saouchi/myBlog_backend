@@ -12,7 +12,7 @@ exports.createLike = async (req, res, next) => {
     const post = await Post.findById(req.params.postId).exec();
     post.likes = [...post.likes, like];
     await post.save();
-    res.json({ message: 'like created' });
+    res.json({ message: 'like created', likeId: like._id });
   } catch (err) {
     next(err);
   }
