@@ -37,7 +37,8 @@ exports.deleteLike = async (req, res, next) => {
   try {
     await Like.findByIdAndDelete(req.params.likeId);
     const post = await Post.findById(req.params.postId).exec();
-    post.likes = post.likes.filter((like) => like._id === req.params.likeId);
+    post.likes = post.likes.filter((id) => id.toString() === req.params.likeId);
+
     await post.save();
     res.json({ message: 'Like deleted' });
   } catch (err) {
