@@ -37,6 +37,13 @@ exports.getSpecificPost = async (req, res, next) => {
     const post = await Post.findById(req.params.postId)
       .populate('author', 'firstName lastName')
       .populate('topics')
+      .populate({
+        path: 'comments',
+        populate: {
+          path: 'author',
+          select: 'username',
+        },
+      })
       .exec();
     res.json(post);
   } catch (err) {
