@@ -33,9 +33,8 @@ exports.createComment = async (req, res, next) => {
 exports.deleteComment = async (req, res, next) => {
   try {
     const post = await Post.findById(req.params.postId).exec();
-    console.log('post:', post);
     post.comments = post.comments.filter(
-      (commentId) => commentId === req.params.commentId
+      (commentId) => commentId.toString() !== req.params.commentId
     );
     await post.save();
     await Comment.findByIdAndDelete(req.params.commentId);
@@ -57,6 +56,16 @@ exports.updateComment = async (req, res, next) => {
     res.json({
       message: 'Comment updated',
     });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getComment = async (req, res, next) => {
+  try {
+    const comment = await Comment.findById(req.params.commentId).exec();
+    if (!comment) return res.status(404).json({ message: 'Comment not found' });
+    return res.json(comment);
   } catch (err) {
     next(err);
   }

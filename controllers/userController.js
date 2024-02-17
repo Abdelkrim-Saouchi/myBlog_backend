@@ -56,6 +56,7 @@ exports.userLogin = [
         return res.json({
           message: 'Auth passed',
           token: token,
+          userId: user._id,
         });
       }
       return res.status(401).json({ message: 'Auth failed!' });

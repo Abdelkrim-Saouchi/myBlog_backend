@@ -62,6 +62,14 @@ router.put(
   commentController.updateComment
 );
 
+// GET request to get specific comment info on specific post
+router.get(
+  '/:postId/comments/:commentId',
+  passport.authenticate('jwt', { session: false }),
+  checkPermission(['user', 'author']),
+  commentController.getComment
+);
+
 // POST request to create like on specific post
 router.post(
   '/:postId/likes',
