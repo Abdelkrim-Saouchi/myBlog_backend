@@ -15,13 +15,13 @@ exports.getAllComments = async (req, res, next) => {
 exports.createComment = async (req, res, next) => {
   const newComment = new Comment({
     post: req.body.post,
-    author: req.body.author,
+    author: req.user._id,
     content: req.body.content,
   });
 
   try {
     const post = await Post.findById(req.params.postId).exec();
-    post.comments = [newComment._id];
+    post.comments = [...post.comments, newComment._id];
     await newComment.save();
     await post.save();
     res.json(newComment);
