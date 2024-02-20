@@ -1,8 +1,22 @@
 const Post = require('../models/post');
 
-exports.getAllPostsList = async (req, res, next) => {
+// for specific author
+exports.getAuthorAllPostsList = async (req, res, next) => {
   try {
-    const allPosts = await Post.find({})
+    const allPosts = await Post.find({ author: req.user._id })
+      .populate('author', 'firstName lastName')
+      .populate('topics')
+      .exec();
+    res.json(allPosts);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// for users
+exports.getAllPublishedPosts = async (req, res, next) => {
+  try {
+    const allPosts = await Post.find({ published: true })
       .populate('author', 'firstName lastName')
       .populate('topics')
       .exec();

@@ -5,8 +5,16 @@ const commentController = require('../controllers/commentController');
 const likeController = require('../controllers/likeController');
 const checkPermission = require('../middlewares/checkPermission');
 
-// GET list of all posts
-router.get('/', postController.getAllPostsList);
+// GET list of all posts for specific author
+router.get(
+  '/',
+  passport.authenticate('jwt', { session: false }),
+  checkPermission(['author']),
+  postController.getAuthorAllPostsList
+);
+
+// GET list of all published posts
+router.get('/public', postController.getAllPublishedPosts);
 
 // POST request to create a post
 router.post(
