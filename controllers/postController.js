@@ -1,4 +1,5 @@
 const Post = require('../models/post');
+const { body, validationResult } = require('express-validator');
 
 // for specific author
 exports.getAuthorAllPostsList = async (req, res, next) => {
@@ -26,25 +27,35 @@ exports.getAllPublishedPosts = async (req, res, next) => {
   }
 };
 
-exports.createPost = async (req, res, next) => {
-  const newPost = new Post({
-    author: req.body.author,
-    title: req.body.title,
-    content: req.body.content,
-    readTime: req.body.readTime,
-    comments: [],
-    likes: [],
-    topics: req.body.topics,
-    published: req.body.published,
-  });
+exports.createPost = [
+  body('title', 'Title must not be empty').trim().isLength({ min: 1 }).escape(),
+  body('content', 'Article Content must not be empty').isLength({ min: 1 }),
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
-  try {
-    await newPost.save();
-    res.json(newPost);
-  } catch (err) {
-    next(err);
-  }
-};
+    const newPost = new Post({
+      author: req.user._id,
+      title: req.body.title,
+      content: req.body.content,
+      readTime: req.body.readTime,
+      comments: [],
+      likes: [],
+      topics: req.body.topics,
+      published: req.body.published,
+    });
+
+    try {
+      await newPost.save();
+      res.json(newPost);
+    } catch (err) {
+      console.log('err:', err);
+      next(err);
+    }
+  },
+];
 
 exports.getSpecificPost = async (req, res, next) => {
   try {

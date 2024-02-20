@@ -1,6 +1,15 @@
 const Topic = require('../models/topic');
 const { body, validationResult } = require('express-validator');
 
+exports.getAllTopics = async (req, res, next) => {
+  try {
+    const topics = await Topic.find({}).exec();
+    return res.json({ topics: topics });
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.createTopic = [
   body('name', 'topic name must not be empty')
     .trim()
