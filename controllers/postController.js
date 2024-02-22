@@ -8,7 +8,7 @@ exports.getAuthorAllPostsList = async (req, res, next) => {
       .populate('author', 'firstName lastName')
       .populate('topics')
       .exec();
-    res.json(allPosts);
+    res.json({ articles: allPosts });
   } catch (err) {
     next(err);
   }
