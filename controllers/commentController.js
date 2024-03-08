@@ -1,10 +1,10 @@
-const Post = require('../models/post');
-const Comment = require('../models/comment');
+const Post = require("../models/post");
+const Comment = require("../models/comment");
 
 exports.getAllComments = async (req, res, next) => {
   try {
     const post = await Post.findById(req.params.postId)
-      .populate('comments')
+      .populate("comments")
       .exec();
     res.json(post.comments);
   } catch (err) {
@@ -13,11 +13,22 @@ exports.getAllComments = async (req, res, next) => {
 };
 
 exports.createComment = async (req, res, next) => {
-  const newComment = new Comment({
-    post: req.body.post,
-    author: req.user._id,
-    content: req.body.content,
-  });
+  let newComment = null;
+  if (req.user.role === "author") {
+    newComment = new Comment({
+      post: req.body.post,
+      author: req.user._id,
+      userModel: "Author",
+      content: req.body.content,
+    });
+  } else {
+    newComment = new Comment({
+      post: req.body.post,
+      author: req.user._id,
+      userModel: "User",
+      content: req.body.content,
+    });
+  }
 
   try {
     const post = await Post.findById(req.params.postId).exec();
@@ -26,6 +37,7 @@ exports.createComment = async (req, res, next) => {
     await post.save();
     res.json(newComment);
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };
@@ -34,12 +46,12 @@ exports.deleteComment = async (req, res, next) => {
   try {
     const post = await Post.findById(req.params.postId).exec();
     post.comments = post.comments.filter(
-      (commentId) => commentId.toString() !== req.params.commentId
+      (commentId) => commentId.toString() !== req.params.commentId,
     );
     await post.save();
     await Comment.findByIdAndDelete(req.params.commentId);
     res.json({
-      message: 'Comment deleted',
+      message: "Comment deleted",
     });
   } catch (err) {
     next(err);
@@ -54,7 +66,7 @@ exports.updateComment = async (req, res, next) => {
     comment.content = newContent;
     await comment.save();
     res.json({
-      message: 'Comment updated',
+      message: "Comment updated",
     });
   } catch (err) {
     next(err);
@@ -64,7 +76,7 @@ exports.updateComment = async (req, res, next) => {
 exports.getComment = async (req, res, next) => {
   try {
     const comment = await Comment.findById(req.params.commentId).exec();
-    if (!comment) return res.status(404).json({ message: 'Comment not found' });
+    if (!comment) return res.status(404).json({ message: "Comment not found" });
     return res.json(comment);
   } catch (err) {
     next(err);
