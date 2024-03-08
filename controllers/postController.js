@@ -1,12 +1,12 @@
-const Post = require('../models/post');
-const { body, validationResult } = require('express-validator');
+const Post = require("../models/post");
+const { body, validationResult } = require("express-validator");
 
 // for specific author
 exports.getAuthorAllPostsList = async (req, res, next) => {
   try {
     const allPosts = await Post.find({ author: req.user._id })
-      .populate('author', 'firstName lastName')
-      .populate('topics')
+      .populate("author", "firstName lastName")
+      .populate("topics")
       .exec();
     res.json({ articles: allPosts });
   } catch (err) {
@@ -18,8 +18,8 @@ exports.getAuthorAllPostsList = async (req, res, next) => {
 exports.getAllPublishedPosts = async (req, res, next) => {
   try {
     const allPosts = await Post.find({ published: true })
-      .populate('author', 'firstName lastName')
-      .populate('topics')
+      .populate("author", "firstName lastName")
+      .populate("topics")
       .exec();
     res.json(allPosts);
   } catch (err) {
@@ -28,8 +28,8 @@ exports.getAllPublishedPosts = async (req, res, next) => {
 };
 
 exports.createPost = [
-  body('title', 'Title must not be empty').trim().isLength({ min: 1 }).escape(),
-  body('content', 'Article Content must not be empty').isLength({ min: 1 }),
+  body("title", "Title must not be empty").trim().isLength({ min: 1 }).escape(),
+  body("content", "Article Content must not be empty").isLength({ min: 1 }),
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -51,7 +51,7 @@ exports.createPost = [
       await newPost.save();
       res.json(newPost);
     } catch (err) {
-      console.log('err:', err);
+      console.log("err:", err);
       next(err);
     }
   },
@@ -60,13 +60,13 @@ exports.createPost = [
 exports.getSpecificPost = async (req, res, next) => {
   try {
     const post = await Post.findById(req.params.postId)
-      .populate('author', 'firstName lastName')
-      .populate('topics')
+      .populate("author", "firstName lastName")
+      .populate("topics")
       .populate({
-        path: 'comments',
+        path: "comments",
         populate: {
-          path: 'author',
-          select: 'username',
+          path: "author",
+          select: "username firstName lastName",
         },
       })
       .exec();
@@ -79,7 +79,7 @@ exports.getSpecificPost = async (req, res, next) => {
 exports.deletePost = async (req, res, next) => {
   try {
     await Post.findByIdAndDelete(req.params.postId);
-    res.json({ message: 'Post deleted' });
+    res.json({ message: "Post deleted" });
   } catch (err) {
     next(err);
   }
@@ -104,9 +104,9 @@ exports.updatePost = async (req, res, next) => {
     const updatedPost = await Post.findByIdAndUpdate(
       req.params.postId,
       newPost,
-      {}
+      {},
     );
-    res.json({ message: 'Post updated' });
+    res.json({ message: "Post updated" });
   } catch (err) {
     next(err);
   }
