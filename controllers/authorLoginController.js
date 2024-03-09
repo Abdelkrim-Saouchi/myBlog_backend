@@ -1,12 +1,12 @@
-const Author = require('../models/author');
-require('dotenv').config();
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const { body, validationResult } = require('express-validator');
+const Author = require("../models/author");
+require("dotenv").config();
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const { body, validationResult } = require("express-validator");
 
 exports.authorLogIn = [
-  body('email', 'invalid email').trim().isLength({ min: 1 }).escape(),
-  body('password', 'invalid password').trim().isLength({ min: 1 }).escape(),
+  body("email", "invalid email").trim().isLength({ min: 1 }).escape(),
+  body("password", "invalid password").trim().isLength({ min: 1 }).escape(),
 
   async (req, res, next) => {
     const errors = validationResult(req);
@@ -18,27 +18,28 @@ exports.authorLogIn = [
     try {
       const author = await Author.findOne(
         { email: email },
-        'email password'
+        "email password",
       ).exec();
 
       if (email === author.email) {
         const match = await bcrypt.compare(password, author.password);
         if (match) {
           const options = {};
-          options.expiresIn = 120 * 60 * 60;
+          options.expiresIn = "1d";
           const secret = process.env.SECRET;
           const token = jwt.sign(
             { id: author._id, email: author.email, admin: true },
             secret,
-            options
+            options,
           );
           return res.json({
-            message: 'auth passed',
+            message: "auth passed",
             token: token,
+            expiresIn: options.expiresIn,
           });
         }
       }
-      res.status(401).json({ message: 'Auth failed' });
+      res.status(401).json({ message: "Auth failed" });
     } catch (err) {
       next(err);
     }
