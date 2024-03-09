@@ -1,17 +1,17 @@
-const User = require('../models/user');
-require('dotenv').config();
-const jwt = require('jsonwebtoken');
-const { body, validationResult } = require('express-validator');
+const User = require("../models/user");
+require("dotenv").config();
+const jwt = require("jsonwebtoken");
+const { body, validationResult } = require("express-validator");
 
 exports.userSignUp = [
-  body('username', 'Invalid username').trim().isLength({ min: 1 }).escape(),
-  body('email', 'Invalid email').trim().isLength({ min: 1 }).escape(),
-  body('password', 'Invalid password').trim().isLength({ min: 1 }).escape(),
-  body('confirmation')
+  body("username", "Invalid username").trim().isLength({ min: 1 }).escape(),
+  body("email", "Invalid email").trim().isLength({ min: 1 }).escape(),
+  body("password", "Invalid password").trim().isLength({ min: 1 }).escape(),
+  body("confirmation")
     .custom((value, { req }) => {
       return value === req.body.password;
     })
-    .withMessage('Passwords do not match!'),
+    .withMessage("Passwords do not match!"),
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -33,8 +33,8 @@ exports.userSignUp = [
 ];
 
 exports.userLogin = [
-  body('email', 'invalid email').trim().isLength({ min: 1 }).escape(),
-  body('password', 'invalid password').trim().isLength({ min: 1 }).escape(),
+  body("email", "invalid email").trim().isLength({ min: 1 }).escape(),
+  body("password", "invalid password").trim().isLength({ min: 1 }).escape(),
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -46,20 +46,21 @@ exports.userLogin = [
       const user = await User.findOne({ email: email }).exec();
       if (email === user.email && password === user.password) {
         const options = {};
-        options.expiresIn = '2 days';
+        options.expiresIn = "2d";
         const secret = process.env.SECRET;
         const token = jwt.sign(
           { id: user._id, username: user.username, admin: false },
           secret,
-          options
+          options,
         );
         return res.json({
-          message: 'Auth passed',
+          message: "Auth passed",
           token: token,
           userId: user._id,
+          expiresIn: options.expiresIn,
         });
       }
-      return res.status(401).json({ message: 'Auth failed!' });
+      return res.status(401).json({ message: "Auth failed!" });
     } catch (err) {
       next(err);
     }
