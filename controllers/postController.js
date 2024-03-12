@@ -16,12 +16,18 @@ exports.getAuthorAllPostsList = async (req, res, next) => {
 
 // for users
 exports.getAllPublishedPosts = async (req, res, next) => {
+  const page = req?.query?.p - 1 || 0;
+  const ARTICLES_PER_PAGE = 2;
   try {
+    const articlesNumber = await Post.countDocuments({ published: true });
+    const totalPages = Math.ceil(articlesNumber / ARTICLES_PER_PAGE);
     const allPosts = await Post.find({ published: true })
+      .limit(ARTICLES_PER_PAGE)
+      .skip(page * ARTICLES_PER_PAGE)
       .populate("author", "firstName lastName")
       .populate("topics")
       .exec();
-    res.json(allPosts);
+    res.json({ articles: allPosts, totalPages: totalPages });
   } catch (err) {
     next(err);
   }
