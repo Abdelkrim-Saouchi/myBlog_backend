@@ -117,3 +117,21 @@ exports.updatePost = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.searchPost = async (req, res, next) => {
+  const q = req.query.q;
+  console.log("q", q);
+  try {
+    const posts = await Post.find({ $text: { $search: `\"${q}\"` } })
+      .sort({
+        score: { $meta: "textScore" },
+      })
+      .populate("author", "firstName lastName")
+      .populate("topics")
+      .exec();
+    res.json({ articles: posts });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
