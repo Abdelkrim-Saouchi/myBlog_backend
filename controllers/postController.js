@@ -1,5 +1,5 @@
 const Post = require("../models/post");
-const { body, validationResult } = require("express-validator");
+const { body, query, validationResult } = require("express-validator");
 
 // for specific author
 exports.getAuthorAllPostsList = async (req, res, next) => {
@@ -118,20 +118,25 @@ exports.updatePost = async (req, res, next) => {
   }
 };
 
-exports.searchPost = async (req, res, next) => {
-  const q = req.query.q;
-  console.log("q", q);
-  try {
-    const posts = await Post.find({ $text: { $search: `\"${q}\"` } })
-      .sort({
-        score: { $meta: "textScore" },
-      })
-      .populate("author", "firstName lastName")
-      .populate("topics")
-      .exec();
-    res.json({ articles: posts });
-  } catch (err) {
-    console.log(err);
-    next(err);
-  }
-};
+exports.searchPost = [
+  query("q", "Invalid search input").trim().escape(),
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.json({ errors: errors.array() });
+    }
+    const q = req.query.q;
+    try {
+      const posts = await Post.find({ $text: { $search: `\"${q}\"` } })
+        .sort({
+          score: { $meta: "textScore" },
+        })
+        .populate("author", "firstName lastName")
+        .populate("topics")
+        .exec();
+      res.json({ articles: posts });
+    } catch (err) {
+      next(err);
+    }
+  },
+];
