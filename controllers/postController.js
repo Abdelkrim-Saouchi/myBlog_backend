@@ -140,3 +140,26 @@ exports.searchPost = [
     }
   },
 ];
+
+exports.filterPosts = [
+  query("q", "invalid filter query").trim().escape(),
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.json({ errors: errors.array() });
+    }
+    const q = req.query.q;
+    console.log("query:", q);
+    const topicsList = q?.split(";") || [];
+    try {
+      const posts = await Post.find({ topics: { $in: topicsList } })
+        .populate("author", "firstName lastName")
+        .populate("topics")
+        .exec();
+      return res.json({ articles: posts });
+    } catch (err) {
+      console.log(err);
+      next(err);
+    }
+  },
+];

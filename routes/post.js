@@ -108,4 +108,7 @@ router.get(
 // Get request to search posts
 router.get("/search/post", postController.searchPost);
 
+// Get request to filter posts
+router.get("/filter/post", postController.filterPosts);
+
 module.exports = router;
