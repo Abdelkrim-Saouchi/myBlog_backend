@@ -1,6 +1,9 @@
 const Post = require("../models/post");
 const { body, query, validationResult } = require("express-validator");
 
+// Global variables
+const ARTICLES_PER_PAGE = 2;
+
 // for specific author
 exports.getAuthorAllPostsList = async (req, res, next) => {
   try {
@@ -17,7 +20,6 @@ exports.getAuthorAllPostsList = async (req, res, next) => {
 // for users
 exports.getAllPublishedPosts = async (req, res, next) => {
   const page = req?.query?.p - 1 || 0;
-  const ARTICLES_PER_PAGE = 2;
   try {
     const articlesNumber = await Post.countDocuments({ published: true });
     const totalPages = Math.ceil(articlesNumber / ARTICLES_PER_PAGE);
@@ -143,20 +145,31 @@ exports.searchPost = [
 
 exports.filterPosts = [
   query("q", "invalid filter query").trim().escape(),
+  query("p", "invalid filter query").trim().escape(),
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.json({ errors: errors.array() });
     }
-    const q = req.query.q;
-    console.log("query:", q);
+    const q = req.query?.q === "" ? null : req.query.q;
+    const p = req.query?.p - 1 || 0;
     const topicsList = q?.split(";") || [];
     try {
-      const posts = await Post.find({ topics: { $in: topicsList } })
+      const count = await Post.countDocuments({
+        topics: { $in: topicsList },
+        published: true,
+      });
+      const posts = await Post.find({
+        topics: { $in: topicsList },
+        published: true,
+      })
+        .limit(ARTICLES_PER_PAGE)
+        .skip(p * ARTICLES_PER_PAGE)
         .populate("author", "firstName lastName")
         .populate("topics")
         .exec();
-      return res.json({ articles: posts });
+      const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
+      return res.json({ articles: posts, totalPages: totalPages });
     } catch (err) {
       console.log(err);
       next(err);
