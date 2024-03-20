@@ -122,21 +122,33 @@ exports.updatePost = async (req, res, next) => {
 
 exports.searchPost = [
   query("q", "Invalid search input").trim().escape(),
+  query("p", "Invalid search input").trim().escape(),
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.json({ errors: errors.array() });
     }
     const q = req.query.q;
+    const p = req.query.p - 1 || 0;
     try {
-      const posts = await Post.find({ $text: { $search: `\"${q}\"` } })
+      const count = await Post.countDocuments({
+        $text: { $search: `\"${q}\"` },
+        published: true,
+      });
+      const posts = await Post.find({
+        $text: { $search: `\"${q}\"` },
+        published: true,
+      })
         .sort({
           score: { $meta: "textScore" },
         })
+        .limit(ARTICLES_PER_PAGE)
+        .skip(p * ARTICLES_PER_PAGE)
         .populate("author", "firstName lastName")
         .populate("topics")
         .exec();
-      res.json({ articles: posts });
+      const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
+      res.json({ articles: posts, totalPages: totalPages });
     } catch (err) {
       next(err);
     }
