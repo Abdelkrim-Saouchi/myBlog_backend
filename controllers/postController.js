@@ -99,39 +99,93 @@ exports.getSpecificPost = async (req, res, next) => {
 
 exports.deletePost = async (req, res, next) => {
   try {
-    await Post.findByIdAndDelete(req.params.postId);
+    const deletedPost = await Post.findByIdAndDelete(req.params.postId);
+    if (deletedPost.imgID) {
+      await cloudinary.uploader.destroy(deletedPost.imgID);
+    }
     res.json({ message: "Post deleted" });
   } catch (err) {
     next(err);
   }
 };
 
-exports.updatePost = async (req, res, next) => {
-  try {
-    const oldPost = await Post.findById(req.params.postId).exec();
+exports.updatePost = [
+  body("title", "Title must not be empty").trim().isLength({ min: 1 }).escape(),
+  body("content", "Article Content must not be empty").isLength({ min: 1 }),
+  body("readTime", "readTime must not be empty")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("topics.*", "invalid topics").escape(),
+  body("published", "invalid published value").escape(),
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    try {
+      const oldPost = await Post.findById(req.params.postId).exec();
+      const file = req.body.file;
+      let newPost;
 
-    const newPost = new Post({
-      _id: req.params.postId,
-      author: req.body.author,
-      title: req.body.title,
-      content: req.body.content,
-      readTime: req.body.readTime,
-      comments: oldPost.comments,
-      likes: oldPost.likes,
-      topics: req.body.topics,
-      published: req.body.published,
-    });
+      // if new image did not uplaoded
+      if (file === "") {
+        newPost = new Post({
+          _id: req.params.postId,
+          author: req.body.author,
+          title: req.body.title,
+          content: req.body.content,
+          readTime: req.body.readTime,
+          comments: oldPost.comments,
+          likes: oldPost.likes,
+          topics: req.body.topics,
+          published: req.body.published,
+          imgURL: oldPost.imgURL,
+          imgID: oldPost.imgID,
+        });
+      }
+      // if new image uploaded
+      else {
+        // if the new image is not image type
+        if (!file.includes("image")) {
+          const err = new Error("File must be image type");
+          console.log("err1:", err);
+          return next(err);
+        }
+        // delete old image on cloudinary
+        if (oldPost.imgID) {
+          await cloudinary.uploader.destroy(oldPost.imgID);
+        }
+        // updload new image to cloudinary
+        const uploadResult = await cloudinary.uploader.upload(file, {
+          folder: "blog",
+        });
+        const imgURL = uploadResult.secure_url;
+        const imgID = uploadResult.public_id;
 
-    const updatedPost = await Post.findByIdAndUpdate(
-      req.params.postId,
-      newPost,
-      {},
-    );
-    res.json({ message: "Post updated" });
-  } catch (err) {
-    next(err);
-  }
-};
+        newPost = new Post({
+          _id: req.params.postId,
+          author: req.body.author,
+          title: req.body.title,
+          content: req.body.content,
+          readTime: req.body.readTime,
+          comments: oldPost.comments,
+          likes: oldPost.likes,
+          topics: req.body.topics,
+          published: req.body.published,
+          imgURL: imgURL,
+          imgID: imgID,
+        });
+      }
+
+      await Post.findByIdAndUpdate(req.params.postId, newPost, {});
+      res.json({ message: "Post updated" });
+    } catch (err) {
+      console.log(err);
+      next(err);
+    }
+  },
+];
 
 exports.searchPost = [
   query("q", "Invalid search input").trim().escape(),
