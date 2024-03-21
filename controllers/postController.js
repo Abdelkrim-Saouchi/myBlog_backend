@@ -1,5 +1,6 @@
 const Post = require("../models/post");
 const { body, query, validationResult } = require("express-validator");
+const cloudinary = require("../config/cloudinary");
 
 // Global variables
 const ARTICLES_PER_PAGE = 2;
@@ -38,28 +39,40 @@ exports.getAllPublishedPosts = async (req, res, next) => {
 exports.createPost = [
   body("title", "Title must not be empty").trim().isLength({ min: 1 }).escape(),
   body("content", "Article Content must not be empty").isLength({ min: 1 }),
+  body("readTime", "readTime must not be empty")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("topics.*", "invalid topics").escape(),
+  body("published", "invalid published value").escape(),
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-
-    const newPost = new Post({
-      author: req.user._id,
-      title: req.body.title,
-      content: req.body.content,
-      readTime: req.body.readTime,
-      comments: [],
-      likes: [],
-      topics: req.body.topics,
-      published: req.body.published,
-    });
-
     try {
+      const uploadResult = await cloudinary.uploader.upload(req.body.file, {
+        folder: "blog",
+      });
+      const imgURL = uploadResult.secure_url;
+      const imgID = uploadResult.public_id;
+
+      const newPost = new Post({
+        author: req.user._id,
+        title: req.body.title,
+        content: req.body.content,
+        readTime: req.body.readTime,
+        comments: [],
+        likes: [],
+        topics: req.body.topics,
+        published: req.body.published,
+        imgURL: imgURL,
+        imgID: imgID,
+      });
+
       await newPost.save();
       res.json(newPost);
     } catch (err) {
-      console.log("err:", err);
       next(err);
     }
   },
