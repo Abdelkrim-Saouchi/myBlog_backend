@@ -1,36 +1,38 @@
-const mongoose = require('mongoose');
-const { format } = require('date-fns');
+const mongoose = require("mongoose");
+const { format } = require("date-fns");
 
 const Schema = mongoose.Schema;
 
 const PostSchema = new Schema(
   {
-    author: { type: Schema.Types.ObjectId, ref: 'Author', required: true },
+    author: { type: Schema.Types.ObjectId, ref: "Author", required: true },
     title: { type: String, required: true },
     content: { type: String, required: true },
     readTime: { type: Number, required: true },
     comments: {
       type: [Schema.Types.ObjectId],
-      ref: 'Comment',
+      ref: "Comment",
     },
     likes: {
       type: [Schema.Types.ObjectId],
-      ref: 'Like',
+      ref: "Like",
     },
     topics: {
       type: [Schema.Types.ObjectId],
-      ref: 'Topic',
+      ref: "Topic",
     },
     published: Boolean,
+    imgURL: String,
+    imgID: String,
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-PostSchema.virtual('creationDate').get(function () {
-  const formattedDate = format(this.createdAt, 'MMM dd yyyy');
+PostSchema.virtual("creationDate").get(function () {
+  const formattedDate = format(this.createdAt, "MMM dd yyyy");
   return formattedDate;
 });
 
-PostSchema.set('toJSON', { virtuals: true });
+PostSchema.set("toJSON", { virtuals: true });
 
-module.exports = mongoose.model('Post', PostSchema);
+module.exports = mongoose.model("Post", PostSchema);
