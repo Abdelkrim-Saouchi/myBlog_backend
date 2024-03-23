@@ -21,15 +21,40 @@ exports.getAuthorAllPostsList = async (req, res, next) => {
 // for users
 exports.getAllPublishedPosts = async (req, res, next) => {
   const page = req?.query?.p - 1 || 0;
+  const sortBy = req.query?.sortBy;
+  console.log("sortBy", sortBy);
   try {
     const articlesNumber = await Post.countDocuments({ published: true });
     const totalPages = Math.ceil(articlesNumber / ARTICLES_PER_PAGE);
-    const allPosts = await Post.find({ published: true })
-      .limit(ARTICLES_PER_PAGE)
-      .skip(page * ARTICLES_PER_PAGE)
-      .populate("author", "firstName lastName")
-      .populate("topics")
-      .exec();
+    let allPosts;
+    if (sortBy === "likes") {
+      console.log("run if");
+      allPosts = await Post.find({ published: true })
+        .populate("author", "firstName lastName")
+        .populate("topics")
+        .sort({ "likes.length": "desc" })
+        .limit(ARTICLES_PER_PAGE)
+        .skip(page * ARTICLES_PER_PAGE)
+        .exec();
+    } else if (sortBy === "comments") {
+      console.log("run if eles");
+      allPosts = await Post.find({ published: true })
+        .populate("author", "firstName lastName")
+        .populate("topics")
+        .sort({ "comments.length": "desc" })
+        .limit(ARTICLES_PER_PAGE)
+        .skip(page * ARTICLES_PER_PAGE)
+        .exec();
+    } else {
+      console.log("run else");
+      allPosts = await Post.find({ published: true })
+        .populate("author", "firstName lastName")
+        .limit(ARTICLES_PER_PAGE)
+        .skip(page * ARTICLES_PER_PAGE)
+        .populate("topics")
+        .exec();
+    }
+    console.log("posts:", allPosts);
     res.json({ articles: allPosts, totalPages: totalPages });
   } catch (err) {
     next(err);
