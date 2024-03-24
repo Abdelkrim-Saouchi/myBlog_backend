@@ -20,7 +20,7 @@ exports.getAuthorAllPostsList = async (req, res, next) => {
 
 // for users
 exports.getAllPublishedPosts = async (req, res, next) => {
-  const page = req?.query?.p - 1 || 0;
+  const page = req.query?.p - 1 || 0;
   const sortBy = req.query?.sortBy;
   try {
     const articlesNumber = await Post.countDocuments({ published: true });
@@ -111,6 +111,9 @@ exports.getSpecificPost = async (req, res, next) => {
         },
       })
       .exec();
+    if (!post) {
+      return res.status(404);
+    }
     res.json(post);
   } catch (err) {
     next(err);
