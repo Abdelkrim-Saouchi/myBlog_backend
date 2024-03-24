@@ -19,7 +19,8 @@ exports.userSignUp = [
       console.log("errors:", errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
-    const email = User.findOne({ email: req.body.email }).exec();
+    const email = await User.findOne({ email: req.body.email }).exec();
+    console.log("email:", email);
     if (email) {
       return res.status(400).json({
         errors: [{ path: "email", msg: "Email Already exists, try another" }],
