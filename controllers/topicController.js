@@ -13,6 +13,9 @@ exports.getAllTopics = async (req, res, next) => {
 exports.getSpecificTopic = async (req, res, next) => {
   try {
     const topic = await Topic.findById(req.params.id).exec();
+    if (!topic) {
+      return res.status(404);
+    }
     return res.json({ topic: topic });
   } catch (err) {
     next(err);
@@ -37,7 +40,7 @@ exports.createTopic = [
     });
     try {
       await newTopic.save();
-      res.json({ message: "new Topic created" });
+      res.status(201).json({ message: "new Topic created" });
     } catch (err) {
       next(err);
     }
@@ -63,12 +66,13 @@ exports.updateTopic = [
         .json({ message: "Invalid inputs", errors: errors.array() });
     }
 
-    const topic = new Topic({
-      name: req.body.name,
-      _id: req.params.topicId,
-    });
     try {
-      await Topic.findByIdAndUpdate(req.params.topicId, topic, {});
+      const topic = await Topic.findById(req.params.topicId);
+      if (!topic) {
+        return res.status(404);
+      }
+      topic.name = req.body.name;
+      await topic.save();
       res.json({ message: "Topic updated" });
     } catch (err) {
       next(err);
