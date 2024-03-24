@@ -44,7 +44,7 @@ router.put(
 );
 
 // GET request to get all comments of specific post
-router.get("/:postId/comments", commentController.getAllComments);
+// router.get("/:postId/comments", commentController.getAllComments);
 
 // POST request to create comment on specific post
 router.post(
