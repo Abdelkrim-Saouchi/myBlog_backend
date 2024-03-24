@@ -91,7 +91,7 @@ exports.createPost = [
       });
 
       await newPost.save();
-      res.json(newPost);
+      res.status(201).json(newPost);
     } catch (err) {
       next(err);
     }
