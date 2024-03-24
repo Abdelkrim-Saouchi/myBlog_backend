@@ -70,20 +70,34 @@ exports.deleteComment = async (req, res, next) => {
   }
 };
 
-exports.updateComment = async (req, res, next) => {
-  const newContent = req.body.content;
+exports.updateComment = [
+  body("commentText", "Comment must not be empty")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
-  try {
-    const comment = await Comment.findById(req.params.commentId).exec();
-    comment.content = newContent;
-    await comment.save();
-    res.json({
-      message: "Comment updated",
-    });
-  } catch (err) {
-    next(err);
-  }
-};
+    const newContent = req.body.content;
+
+    try {
+      const comment = await Comment.findById(req.params.commentId).exec();
+      if (!comment) {
+        return res.status(404);
+      }
+      comment.content = newContent;
+      await comment.save();
+      res.json({
+        message: "Comment updated",
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+];
 
 exports.getComment = async (req, res, next) => {
   try {
