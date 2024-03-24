@@ -16,7 +16,14 @@ exports.userSignUp = [
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log("errors:", errors.array());
       return res.status(400).json({ errors: errors.array() });
+    }
+    const email = User.findOne({ email: req.body.email }).exec();
+    if (email) {
+      return res.status(400).json({
+        errors: [{ path: "email", msg: "Email Already exists, try another" }],
+      });
     }
     bcrypt.hash(req.body.password, 10, async (err, hashedPassword) => {
       if (err) return next(err);
@@ -28,8 +35,11 @@ exports.userSignUp = [
       });
 
       try {
-        await user.save();
-        res.json(user._id);
+        const createdUser = await user.save();
+        if (createdUser) {
+          return res.status(201).json(createdUser._id);
+        }
+        res.status(409);
       } catch (err) {
         next(err);
       }
