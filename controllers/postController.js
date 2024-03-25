@@ -122,6 +122,13 @@ exports.getSpecificPost = async (req, res, next) => {
 
 exports.deletePost = async (req, res, next) => {
   try {
+    const targetPost = await Post.findById(req.params.postId);
+
+    // prevent authors from delete articles that do not own
+    if (targetPost.author.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Not allowed" });
+    }
+
     const deletedPost = await Post.findByIdAndDelete(req.params.postId);
     if (deletedPost.imgID) {
       await cloudinary.uploader.destroy(deletedPost.imgID);
@@ -148,14 +155,19 @@ exports.updatePost = [
     }
     try {
       const oldPost = await Post.findById(req.params.postId).exec();
+
+      // prevent authors from edit articles that do not own
+      if (oldPost.author.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: "Not allowed" });
+      }
       const file = req.body.file;
       let newPost;
-
+      console.log("author", req.user._id);
       // if new image did not uplaoded
       if (file === "") {
         newPost = new Post({
           _id: req.params.postId,
-          author: req.body.author,
+          author: req.user._id,
           title: req.body.title,
           content: req.body.content,
           readTime: req.body.readTime,
@@ -163,8 +175,8 @@ exports.updatePost = [
           likes: oldPost.likes,
           topics: req.body.topics,
           published: req.body.published,
-          imgURL: oldPost.imgURL,
-          imgID: oldPost.imgID,
+          imgURL: oldPost?.imgURL || undefined,
+          imgID: oldPost?.imgID || undefined,
         });
       }
       // if new image uploaded
