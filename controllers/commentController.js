@@ -57,6 +57,13 @@ exports.createComment = [
 exports.deleteComment = async (req, res, next) => {
   try {
     const post = await Post.findById(req.params.postId).exec();
+    const comment = await Comment.findById(req.params.commentId).exec();
+
+    // prevent users from delete comments that do not own
+    if (comment.author.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Not allowed" });
+    }
+
     post.comments = post.comments.filter(
       (commentId) => commentId.toString() !== req.params.commentId,
     );
@@ -78,22 +85,30 @@ exports.updateComment = [
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log(errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const newContent = req.body.content;
+    const newContent = req.body.commentText;
 
     try {
       const comment = await Comment.findById(req.params.commentId).exec();
       if (!comment) {
-        return res.status(404);
+        return res.status(404).json({ message: "Not found" });
       }
+
+      // prevent users from update comments that do not own
+      if (comment.author.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: "Not allowed" });
+      }
+
       comment.content = newContent;
       await comment.save();
       res.json({
         message: "Comment updated",
       });
     } catch (err) {
+      console.log(err);
       next(err);
     }
   },
