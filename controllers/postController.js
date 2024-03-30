@@ -30,7 +30,7 @@ exports.getAllPublishedPosts = async (req, res, next) => {
       allPosts = await Post.find({ published: true })
         .populate("author", "firstName lastName")
         .populate("topics")
-        .sort({ likes: -1 })
+        .sort({ likesCount: -1 })
         .limit(ARTICLES_PER_PAGE)
         .skip(page * ARTICLES_PER_PAGE)
         .exec();
@@ -38,7 +38,7 @@ exports.getAllPublishedPosts = async (req, res, next) => {
       allPosts = await Post.find({ published: true })
         .populate("author", "firstName lastName")
         .populate("topics")
-        .sort({ comments: -1 })
+        .sort({ commentsCount: -1 })
         .limit(ARTICLES_PER_PAGE)
         .skip(page * ARTICLES_PER_PAGE)
         .exec();

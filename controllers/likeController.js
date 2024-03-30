@@ -14,6 +14,7 @@ exports.createLike = async (req, res, next) => {
     await like.save();
     const post = await Post.findById(req.params.postId).exec();
     post.likes = [...post.likes, like];
+    post.likesCount = post.likes.length;
     await post.save();
     res.status(201).json({ message: "like created", likeId: like._id });
   } catch (err) {
@@ -42,6 +43,7 @@ exports.deleteLike = async (req, res, next) => {
     const post = await Post.findById(req.params.postId).exec();
 
     post.likes = post.likes.filter((id) => id.toString() !== req.params.likeId);
+    post.likesCount = post.likes.length;
 
     const savedPost = await post.save();
     if (!savedPost) {
