@@ -30,25 +30,25 @@ exports.createComment = [
         post: req.body.post,
         author: req.user._id,
         userModel: "Author",
-        content: req.body.content,
+        content: req.body.commentText,
       });
     } else {
       newComment = new Comment({
         post: req.body.post,
         author: req.user._id,
         userModel: "User",
-        content: req.body.content,
+        content: req.body.commentText,
       });
     }
 
     try {
       const post = await Post.findById(req.params.postId).exec();
       post.comments = [...post.comments, newComment._id];
+      post.commentsCount = post.comments.length;
       await newComment.save();
       await post.save();
       res.json(newComment);
     } catch (err) {
-      console.log(err);
       next(err);
     }
   },
@@ -67,6 +67,8 @@ exports.deleteComment = async (req, res, next) => {
     post.comments = post.comments.filter(
       (commentId) => commentId.toString() !== req.params.commentId,
     );
+    post.commentsCount = post.comments.length;
+
     await post.save();
     await Comment.findByIdAndDelete(req.params.commentId);
     res.json({
