@@ -38,18 +38,19 @@ exports.deleteLike = async (req, res, next) => {
   try {
     const deletedLike = await Like.findByIdAndDelete(req.params.likeId);
     if (!deletedLike) {
-      return res.status(409);
+      return res.status(409).json({ message: "delete failed" });
     }
     const post = await Post.findById(req.params.postId).exec();
-
     post.likes = post.likes.filter((id) => id.toString() !== req.params.likeId);
     post.likesCount = post.likes.length;
 
     const savedPost = await post.save();
     if (!savedPost) {
-      return res.status(409);
+      return res
+        .status(409)
+        .json({ message: "delete likes from post failed!" });
     }
-    res.status(204);
+    res.status(202).json({ message: "success" });
   } catch (err) {
     next(err);
   }
