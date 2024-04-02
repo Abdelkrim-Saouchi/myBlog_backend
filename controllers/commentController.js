@@ -60,8 +60,10 @@ exports.deleteComment = async (req, res, next) => {
     const comment = await Comment.findById(req.params.commentId).exec();
 
     // prevent users from delete comments that do not own
-    if (comment.author.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: "Not allowed" });
+    if (req.user.role !== "author") {
+      if (comment.author.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: "Not allowed" });
+      }
     }
 
     post.comments = post.comments.filter(
@@ -100,8 +102,10 @@ exports.updateComment = [
       }
 
       // prevent users from update comments that do not own
-      if (comment.author.toString() !== req.user._id.toString()) {
-        return res.status(403).json({ message: "Not allowed" });
+      if (req.user.role !== "author") {
+        if (comment.author.toString() !== req.user._id.toString()) {
+          return res.status(403).json({ message: "Not allowed" });
+        }
       }
 
       comment.content = newContent;
