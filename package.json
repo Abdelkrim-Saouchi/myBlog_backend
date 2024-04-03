@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Backend app for MyBlog website",
   "scripts": {
-    "start": "nodemon app.js"
+    "startServer": "nodemon app.js",
+    "start": "npm run startServer"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
