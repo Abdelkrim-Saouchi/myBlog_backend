@@ -1,4 +1,10 @@
 {
+  "name": "MyBlog_backend",
+  "version": "1.0.0",
+  "description": "Backend app for MyBlog website",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.0.3",
