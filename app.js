@@ -1,5 +1,7 @@
 const express = require("express");
 const app = express();
+const compression = require("compression");
+const helmet = require("helmet");
 const cors = require("cors");
 const indexRouter = require("./routes/index");
 const postRouter = require("./routes/post");
@@ -7,6 +9,9 @@ const authorSignUpRouter = require("./routes/authorSignup");
 const authorLoginRouter = require("./routes/authorLogin");
 const userRouter = require("./routes/user");
 const topicRouter = require("./routes/topic");
+
+// use helmet
+app.use(helmet());
 
 // Config passport js
 const passport = require("passport");
@@ -19,6 +24,9 @@ app.use(cors());
 
 // Config db
 require("./config/db");
+
+// compress all routes
+app.use(compression());
 
 // routes
 app.use(indexRouter);
