@@ -20,7 +20,17 @@ passport.use(jwtStrategy);
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-app.use(cors());
+
+// allow specific domain
+app.use(
+  cors({
+    origin: [
+      "https://author-krimo-blog.netlify.app",
+      "https://krimo-blog.netlify.app",
+    ],
+    optionsSuccessStatus: 200,
+  }),
+);
 
 // Config db
 require("./config/db");
