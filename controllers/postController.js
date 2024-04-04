@@ -3,7 +3,7 @@ const { body, query, validationResult } = require("express-validator");
 const cloudinary = require("../config/cloudinary");
 
 // Global variables
-const ARTICLES_PER_PAGE = 2;
+const ARTICLES_PER_PAGE = 5;
 
 // for specific author
 exports.getAuthorAllPostsList = async (req, res, next) => {
