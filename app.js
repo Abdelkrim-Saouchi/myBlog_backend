@@ -27,6 +27,8 @@ app.use(
     origin: [
       "https://author-krimo-blog.netlify.app",
       "https://krimo-blog.netlify.app",
+      "http://localhost:5173",
+      "http://localhost:5174",
     ],
     optionsSuccessStatus: 200,
   }),
