@@ -40,12 +40,12 @@ require("./config/db");
 // compress all routes
 app.use(compression());
 
-// set up rate limiter : max of 20 requests per minute
+// set up rate limiter : max of 500 requests per minute
 const RateLimit = require("express-rate-limit");
 app.use(
   RateLimit({
     windowMs: 1 * 60 * 1000,
-    max: 20,
+    max: 500,
   }),
 );
 
